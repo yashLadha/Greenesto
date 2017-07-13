@@ -15,6 +15,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import io.github.yashladha.project.studentFragments.Course;
+import io.github.yashladha.project.studentFragments.Home;
+import io.github.yashladha.project.studentFragments.Lecture;
+
 public class StudentPortal extends AppCompatActivity {
 
 	private String[] mPanelTitles;
@@ -59,6 +63,11 @@ public class StudentPortal extends AppCompatActivity {
 		mListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
 				                                             mPanelTitles));
 		mListView.setOnItemClickListener(new DrawerItemClickListener());
+		setFragment(0); // Default Fragment layout
+	}
+
+	private void setDefaultFragment() {
+
 	}
 
 	@Override
@@ -90,16 +99,32 @@ public class StudentPortal extends AppCompatActivity {
 	class DrawerItemClickListener implements ListView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			Fragment fragment = new StudentFragment();
-			FragmentManager fragmentManager = getSupportFragmentManager();
-			fragmentManager.beginTransaction()
-					.replace(R.id.content_frame, fragment)
-					.commit();
-
-			mListView.setItemChecked(position, true);
-			getSupportActionBar().setTitle(mPanelTitles[position]);
-			mDrawerLayout.closeDrawer(mListView);
+			setFragment(position);
 		}
+	}
+
+	private void setFragment(int position) {
+		Fragment fragment = null;
+		switch (position) {
+			case 0: fragment = new Home();
+				break;
+			case 1: fragment = new Course();
+				break;
+			case 2: fragment = new Lecture();
+				break;
+		}
+		Bundle bundle = new Bundle();
+		bundle.putString("title", mPanelTitles[position]);
+		fragment.setArguments(bundle);
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction()
+				.replace(R.id.content_frame, fragment)
+				.commit();
+
+		mListView.setItemChecked(position, true);
+		mTitle = mPanelTitles[position];
+		getSupportActionBar().setTitle(mPanelTitles[position]);
+		mDrawerLayout.closeDrawer(mListView);
 	}
 
 }
