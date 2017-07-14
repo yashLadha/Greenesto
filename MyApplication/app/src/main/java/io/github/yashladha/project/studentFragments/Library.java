@@ -1,10 +1,10 @@
 package io.github.yashladha.project.studentFragments;
 
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -69,20 +69,25 @@ public class Library extends Fragment {
   }
 
   private void readPdfFromStorage(StorageReference lecLocation) {
-    lecLocation.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-      @Override
-      public void onSuccess(Uri uri) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, "application/pdf");
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        Intent newIntent = Intent.createChooser(intent, "Open File");
-        try {
-          startActivity(newIntent);
-        } catch (ActivityNotFoundException e) {
-          Log.e(TAG, "Activity not found for attachment");
-        }
-      }
-    });
+    try {
+      final File localFile = new File(
+          Environment.getExternalStorageDirectory().toString() + "/lecture.pdf"
+      );
+      lecLocation.getFile(localFile)
+          .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+              if (localFile.exists()) {
+                Log.d(TAG, "File is created " + localFile.getPath());
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.fromFile(localFile), "application/pdf");
+                startActivity(intent);
+              }
+            }
+          });
+    } catch (Exception e) {
+      Log.e(TAG, "Temp file not able to create");
+    }
   }
 
 }
