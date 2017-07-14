@@ -1,13 +1,14 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="io.github.yashladha.project.studentFragments.Lecture">
+<android.support.constraint.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context="io.github.yashladha.project.studentFragments.Lecture">
 
-	<!-- TODO: Update blank fragment layout -->
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:text="@string/hello_blank_fragment"/>
+	<com.google.android.youtube.player.YouTubeThumbnailView
+		android:id="@+id/youtube_thumbnail_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
 
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>
