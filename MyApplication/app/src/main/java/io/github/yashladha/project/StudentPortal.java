@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import io.github.yashladha.project.studentFragments.ChatStudent;
 import io.github.yashladha.project.studentFragments.Course;
 import io.github.yashladha.project.studentFragments.Home;
 import io.github.yashladha.project.studentFragments.Lecture;
@@ -114,6 +115,8 @@ public class StudentPortal extends AppCompatActivity {
 				break;
 			case 2: fragment = new Lecture();
 				break;
+      case 3: fragment = new ChatStudent();
+        break;
       case 4: fragment = new Library();
         break;
       case 7: fragment = new SettingsStudent();
