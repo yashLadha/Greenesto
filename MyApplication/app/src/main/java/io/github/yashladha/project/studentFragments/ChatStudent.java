@@ -2,6 +2,7 @@ package io.github.yashladha.project.studentFragments;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -65,16 +66,30 @@ public class ChatStudent extends Fragment {
     });
 
     chatUserInfo = new ArrayList<>();
+    chatUsers = new HashSet<>();
     RecyclerView chatPersons = (RecyclerView) view.findViewById(R.id.rv_list_person);
     RecyclerView.LayoutManager chatPersonLm = new LinearLayoutManager(getContext());
     chatPersons.setLayoutManager(chatPersonLm);
     PersonSelect personSelect = new PersonSelect(chatUserInfo);
     chatPersons.setAdapter(personSelect);
 
-    FirebaseUser curUser = FirebaseAuth.getInstance().getCurrentUser();
-    if (curUser != null)
-      addChatPerson(curUser.getUid(), personSelect);
+    InflateChat inflateChat = new InflateChat();
+    inflateChat.execute(personSelect);
+
     return view;
+  }
+
+  private class InflateChat extends AsyncTask<PersonSelect, Void, Void> {
+
+    @Override
+    protected Void doInBackground(PersonSelect... params) {
+      PersonSelect personSelect = params[0];
+      FirebaseUser curUser = FirebaseAuth.getInstance().getCurrentUser();
+      if (curUser != null)
+        addChatPerson(curUser.getUid(), personSelect);
+      return null;
+    }
+
   }
 
   private void addChatPerson(String uid, final PersonSelect personSelect) {
@@ -151,22 +166,35 @@ public class ChatStudent extends Fragment {
   }
 
   public List<User> getUserList(final PersonsAdapter persons, final List<User> users) {
-    DatabaseReference userData = FirebaseDatabase.getInstance().getReference();
+    final DatabaseReference userData = FirebaseDatabase.getInstance().getReference();
     userData.addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         for (DataSnapshot data : dataSnapshot.getChildren()) {
-          for (DataSnapshot userInfo : data.getChildren()) {
-            Log.d(TAG, userInfo.toString());
-            User temp = userInfo.getValue(User.class);
-            users.add(temp);
-          }
+          userData.child(data.getKey()).child("UserInfo").addListenerForSingleValueEvent(
+              new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataUser) {
+                  Log.d(TAG, dataUser.toString());
+                  if (dataUser.exists()) {
+                    User temp = dataUser.getValue(User.class);
+                    users.add(temp);
+                  }
+                  persons.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                  Log.e(TAG, databaseError.getMessage());
+                }
+              }
+          );
         }
-        persons.notifyDataSetChanged();
       }
 
       @Override
       public void onCancelled(DatabaseError databaseError) {
+        Log.e(TAG, databaseError.getMessage());
       }
     });
     return users;
