@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.view.animation.LayoutAnimationController;
 import android.widget.PopupWindow;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,20 +27,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
+import io.github.yashladha.project.Adapter.PersonSelect;
 import io.github.yashladha.project.Adapter.PersonsAdapter;
 import io.github.yashladha.project.R;
 import io.github.yashladha.project.User;
 
 public class ChatStudent extends Fragment {
 
+  public static final DatabaseReference DATABASE_REFERENCE = FirebaseDatabase.getInstance()
+      .getReference();
   private String TAG = getClass().getSimpleName();
 
   private FloatingActionButton addPerson;
+  private HashSet<String> chatUsers;
+  private List<User> chatUserInfo;
 
   public ChatStudent() {
-    // Required empty public constructor
   }
 
 
@@ -55,7 +63,64 @@ public class ChatStudent extends Fragment {
         initiatePopup(v);
       }
     });
+
+    chatUserInfo = new ArrayList<>();
+    RecyclerView chatPersons = (RecyclerView) view.findViewById(R.id.rv_list_person);
+    RecyclerView.LayoutManager chatPersonLm = new LinearLayoutManager(getContext());
+    chatPersons.setLayoutManager(chatPersonLm);
+    PersonSelect personSelect = new PersonSelect(chatUserInfo);
+    chatPersons.setAdapter(personSelect);
+
+    FirebaseUser curUser = FirebaseAuth.getInstance().getCurrentUser();
+    if (curUser != null)
+      addChatPerson(curUser.getUid(), personSelect);
     return view;
+  }
+
+  private void addChatPerson(String uid, final PersonSelect personSelect) {
+    DatabaseReference userChatInfo = FirebaseDatabase.getInstance().getReference()
+        .child(uid)
+        .child("Chats");
+    userChatInfo.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        for (DataSnapshot user: dataSnapshot.getChildren()) {
+          String val = (String) user.getValue();
+          if (chatUsers.contains(val)) {
+            Log.d(TAG, "User already added to recycler view");
+          } else {
+            chatUsers.add(val);
+            extractInfoUsers(DATABASE_REFERENCE, val, personSelect);
+          }
+        }
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+        Log.e(TAG, databaseError.getMessage());
+      }
+    });
+  }
+
+  private void extractInfoUsers(DatabaseReference reference, String val,
+                                final PersonSelect personSelect) {
+    reference.child(val).child("UserInfo").addListenerForSingleValueEvent(
+        new ValueEventListener() {
+          @Override
+          public void onDataChange(DataSnapshot dataSnapshot) {
+            if (dataSnapshot.exists()) {
+              User temp = dataSnapshot.getValue(User.class);
+              chatUserInfo.add(temp);
+              personSelect.notifyDataSetChanged();
+            }
+          }
+
+          @Override
+          public void onCancelled(DatabaseError databaseError) {
+            Log.e(TAG, databaseError.getMessage());
+          }
+        }
+    );
   }
 
   private void initiatePopup(View v) {
