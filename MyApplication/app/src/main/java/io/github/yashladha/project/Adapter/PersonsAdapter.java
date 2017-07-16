@@ -13,7 +13,7 @@ import java.util.List;
 import io.github.yashladha.project.R;
 import io.github.yashladha.project.User;
 
-public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHolder>{
+public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHolder> {
 
   private String TAG = getClass().getSimpleName();
   private List<User> users;
@@ -41,15 +41,22 @@ public class PersonsAdapter extends RecyclerView.Adapter<PersonsAdapter.ViewHold
     return users.size();
   }
 
-  public class ViewHolder extends RecyclerView.ViewHolder {
+  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
     TextView email;
     ImageView profileImage;
 
-    public ViewHolder(View itemView) {
+    ViewHolder(View itemView) {
       super(itemView);
+      itemView.setOnClickListener(this);
       email = (TextView) itemView.findViewById(R.id.tv_person_email);
       profileImage = (ImageView) itemView.findViewById(R.id.iv_person_image);
+    }
+
+    @Override
+    public void onClick(View v) {
+      TextView temp = (TextView) v.findViewById(R.id.tv_person_email);
+      Log.d(TAG, temp.getText().toString());
     }
   }
 }

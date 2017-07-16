@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LayoutAnimationController;
@@ -81,6 +82,7 @@ public class ChatStudent extends Fragment {
     popUpWindow.setOutsideTouchable(true);
     popUpWindow.setAnimationStyle(R.style.anim_popup);
     popUpWindow.showAtLocation(v, Gravity.BOTTOM, 0, 100);
+
   }
 
   public List<User> getUserList(final PersonsAdapter persons, final List<User> users) {
