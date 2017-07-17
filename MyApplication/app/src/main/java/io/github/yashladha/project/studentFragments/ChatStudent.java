@@ -70,7 +70,7 @@ public class ChatStudent extends Fragment {
     RecyclerView chatPersons = (RecyclerView) view.findViewById(R.id.rv_list_person);
     RecyclerView.LayoutManager chatPersonLm = new LinearLayoutManager(getContext());
     chatPersons.setLayoutManager(chatPersonLm);
-    PersonSelect personSelect = new PersonSelect(chatUserInfo);
+    PersonSelect personSelect = new PersonSelect(getContext(), chatUserInfo);
     chatPersons.setAdapter(personSelect);
 
     InflateChat inflateChat = new InflateChat();
@@ -180,6 +180,9 @@ public class ChatStudent extends Fragment {
                     User temp = dataUser.getValue(User.class);
                     users.add(temp);
                   }
+
+                  // Not calling if placed below
+                  // - Need to make an Async call after completion
                   persons.notifyDataSetChanged();
                 }
 

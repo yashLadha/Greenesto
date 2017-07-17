@@ -1,6 +1,8 @@
 package io.github.yashladha.project;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 	private String email;
 	private String uid;
 	private String option;

@@ -35,6 +35,8 @@
 			android:label="Student Portal"/>
 		<activity android:name=".studentFragments.util.utilPlayLecture">
 		</activity>
+		<activity android:name=".studentFragments.ChatUI">
+		</activity>
 	</application>
 
 </manifest>

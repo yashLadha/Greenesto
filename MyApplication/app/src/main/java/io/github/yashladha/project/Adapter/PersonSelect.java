@@ -1,22 +1,31 @@
 package io.github.yashladha.project.Adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.List;
 
 import io.github.yashladha.project.R;
 import io.github.yashladha.project.User;
+import io.github.yashladha.project.studentFragments.ChatUI;
 
 public class PersonSelect extends RecyclerView.Adapter<PersonSelect.ViewHolder> {
 
-  List<User> users;
+  private String TAG = getClass().getSimpleName();
 
-  public PersonSelect(List<User> users) {
+  private Context context;
+  private List<User> users;
+
+  public PersonSelect(Context context, List<User> users) {
     this.users = users;
+    this.context = context;
   }
 
   @Override
@@ -50,7 +59,10 @@ public class PersonSelect extends RecyclerView.Adapter<PersonSelect.ViewHolder> 
 
     @Override
     public void onClick(View v) {
-
+      Log.d(TAG, String.valueOf(getAdapterPosition()) + " Clicked");
+      Intent intent = new Intent(context, ChatUI.class);
+      intent.putExtra("userObject", (Serializable) users.get(getAdapterPosition()));
+      context.startActivity(intent);
     }
   }
 }
