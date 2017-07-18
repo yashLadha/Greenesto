@@ -58,18 +58,18 @@ public class ChatUI extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_chat_ui);
 
-    getSupportActionBar().setTitle("Chat " + tempChatUser.getEmail());
-
     inflateChat inflatter = new inflateChat();
     inflatter.execute(DATABASE);
 
     messages = new HashSet<>();
+    messageCnt = new ArrayList<>();
     messageBox = (EditText) findViewById(R.id.et_message_input);
     sendButton = (FloatingActionButton) findViewById(R.id.fab_chat_send);
     messageList = (RecyclerView) findViewById(R.id.rv_chat_messages);
     RecyclerView.LayoutManager lm = new LinearLayoutManager(getApplicationContext());
     messageList.setLayoutManager(lm);
-
+    chatAdapter = new ChatAdapter(messageCnt, UID);
+    messageList.setAdapter(chatAdapter);
 
     sendButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -79,6 +79,7 @@ public class ChatUI extends AppCompatActivity {
           ChatMessage tempMessage = new ChatMessage(textMessage, UID);
           String id_ = uniqueId();
           sendMessage(id_, tempMessage);
+          messageBox.setText("");
         }
       }
     });
@@ -90,7 +91,7 @@ public class ChatUI extends AppCompatActivity {
         .child(tempChatUser.getUid())
         .child("Messages");
     messages.add(id_);
-    CUR_USER_REF.child(id_).push().setValue(message)
+    CUR_USER_REF.child(id_).setValue(message)
     .addOnCompleteListener(new OnCompleteListener<Void>() {
       @Override
       public void onComplete(@NonNull Task<Void> task) {
@@ -98,7 +99,7 @@ public class ChatUI extends AppCompatActivity {
           Log.d(TAG, "User database updated successfully");
       }
     });
-    userRef.child(id_).push().setValue(message)
+    userRef.child(id_).setValue(message)
     .addOnCompleteListener(new OnCompleteListener<Void>() {
       @Override
       public void onComplete(@NonNull Task<Void> task) {
@@ -110,10 +111,10 @@ public class ChatUI extends AppCompatActivity {
     chatAdapter.notifyDataSetChanged();
   }
 
-  private class inflateChat extends AsyncTask<FirebaseDatabase, Void, List<ChatMessage>> {
+  private class inflateChat extends AsyncTask<FirebaseDatabase, Void, Void> {
 
     @Override
-    protected List<ChatMessage> doInBackground(FirebaseDatabase... params) {
+    protected Void doInBackground(FirebaseDatabase... params) {
       Intent intent = getIntent();
       tempChatUser = (User) intent.getSerializableExtra("userObject");
 
@@ -128,12 +129,14 @@ public class ChatUI extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
               for (DataSnapshot item : dataSnapshot.getChildren()) {
                 String key = item.getKey();
+                Log.d(TAG, key);
                 ChatMessage tempMessage = item.getValue(ChatMessage.class);
                 if (messages.contains(key)) {
                   Log.d(TAG, "Message already present");
                 } else {
-                  chat.add(tempMessage);
+                  messageCnt.add(tempMessage);
                   messages.add(key);
+                  chatAdapter.notifyDataSetChanged();
                 }
               }
             }
@@ -144,18 +147,7 @@ public class ChatUI extends AppCompatActivity {
             }
           }
       );
-
-      return chat;
-    }
-
-    @Override
-    protected void onPostExecute(List<ChatMessage> chatMessages) {
-      Log.d(TAG, "Chat message length received: " + chatMessages.size());
-      if (chatMessages.size() > 0) {
-        messageCnt = chatMessages;
-        chatAdapter = new ChatAdapter(chatMessages, UID);
-        messageList.setAdapter(chatAdapter);
-      }
+      return null;
     }
   }
 

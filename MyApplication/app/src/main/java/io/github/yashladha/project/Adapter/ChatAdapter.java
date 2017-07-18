@@ -44,6 +44,7 @@ public class ChatAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
   @Override
   public int getItemViewType(int position) {
     ChatMessage tempMessage = chatMessages.get(position);
+    Log.d(TAG, tempMessage.toString());
     if (tempMessage.getUserUid().equals(uid)) {
       Log.d(TAG, "Inflate own profile");
       return SENDER;
@@ -73,7 +74,7 @@ public class ChatAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     return chatMessages.size();
   }
 
-  class SenderViewHolder extends RecyclerView.ViewHolder {
+  private class SenderViewHolder extends RecyclerView.ViewHolder {
     TextView messageBox;
     SenderViewHolder(View itemView) {
       super(itemView);
@@ -81,9 +82,9 @@ public class ChatAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
   }
 
-  class ReceiverViewHolder extends RecyclerView.ViewHolder {
+  private class ReceiverViewHolder extends RecyclerView.ViewHolder {
     TextView messageBox;
-    public ReceiverViewHolder(View itemView) {
+    ReceiverViewHolder(View itemView) {
       super(itemView);
       messageBox = (TextView) itemView.findViewById(R.id.tv_receiver_text);
     }
