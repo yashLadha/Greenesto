@@ -153,7 +153,7 @@ public class ChatUI extends AppCompatActivity {
       Log.d(TAG, "Chat message length received: " + chatMessages.size());
       if (chatMessages.size() > 0) {
         messageCnt = chatMessages;
-        chatAdapter = new ChatAdapter(chatMessages);
+        chatAdapter = new ChatAdapter(chatMessages, UID);
         messageList.setAdapter(chatAdapter);
       }
     }
