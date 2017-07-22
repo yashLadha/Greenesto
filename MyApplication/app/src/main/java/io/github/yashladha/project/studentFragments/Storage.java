@@ -3,6 +3,7 @@ package io.github.yashladha.project.studentFragments;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -31,9 +32,11 @@ import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import io.github.yashladha.project.Adapter.StorageAdapter;
+import io.github.yashladha.project.Models.StorageFiles;
 import io.github.yashladha.project.R;
 import io.github.yashladha.project.studentFragments.util.ThumbanilPDF;
 
@@ -51,6 +54,7 @@ public class Storage extends Fragment {
       .child(CUR_USER.getUid()).child("Storage");
   private FloatingActionButton uploadBtn;
   private HashSet<Uri> fileSet;
+  private ArrayList<StorageFiles> filesAdap;
   private ThumbanilPDF thumbanilPDF;
   private static final int PDF_FIND = 1;
 
@@ -92,12 +96,15 @@ public class Storage extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_storage, container, false);
+    filesAdap = new ArrayList<>();
     fileSet = new HashSet<>();
     storageList = (RecyclerView) view.findViewById(R.id.rv_storage_list);
     RecyclerView.LayoutManager lm = new GridLayoutManager(getContext(), 3);
     storageList.setLayoutManager(lm);
     uploadBtn = (FloatingActionButton) view.findViewById(R.id.fab_storage_upload);
-    thumbanilPDF = new ThumbanilPDF(getContext());
+    thumbanilPDF = new ThumbanilPDF(getContext(), filesAdap);
+    storageAdapter = new StorageAdapter(filesAdap, getContext());
+    storageList.setAdapter(storageAdapter);
 
     uploadBtn.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -108,37 +115,51 @@ public class Storage extends Fragment {
       }
     });
 
-    DATABASE.addValueEventListener(new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        for (DataSnapshot data : dataSnapshot.getChildren()) {
-          if (!fileSet.contains(Uri.parse((String) data.getValue()))) {
-            Log.d(TAG, String.valueOf(Uri.parse((String) data.getValue())));
-            fileSet.add(Uri.parse((String) data.getValue()));
-            File file = new File("/sdcard/" + data.getKey() + ".pdf");
-            if (!file.exists()) {
-              Ion.with(getContext())
-                  .load((String) data.getValue())
-                  .write(new File("/sdcard/"+data.getKey()+".pdf"))
-                  .setCallback(new FutureCallback<File>() {
-                    @Override
-                    public void onCompleted(Exception e, File result) {
-                      Log.d(TAG, "File download successful " + result.getName());
-                    }
-                  });
-            } else {
-              Log.d(TAG, "File is already present");
+    StorageAsync async = new StorageAsync();
+    async.execute();
+
+    return view;
+  }
+
+  private class StorageAsync extends AsyncTask<Void, Void, Void> {
+
+    @Override
+    protected Void doInBackground(Void... params) {
+      DATABASE.addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+          for (DataSnapshot data : dataSnapshot.getChildren()) {
+            if (!fileSet.contains(Uri.parse((String) data.getValue()))) {
+              Log.d(TAG, String.valueOf(Uri.parse((String) data.getValue())));
+              fileSet.add(Uri.parse((String) data.getValue()));
+              File file = new File("/sdcard/" + data.getKey() + ".pdf");
+              if (!file.exists()) {
+                Ion.with(getContext())
+                    .load((String) data.getValue())
+                    .write(new File("/sdcard/"+data.getKey()+".pdf"))
+                    .setCallback(new FutureCallback<File>() {
+                      @Override
+                      public void onCompleted(Exception e, File result) {
+                        Log.d(TAG, "File download successful " + result.getName());
+                        thumbanilPDF.generateImageFromPdf(Uri.fromFile(result));
+                      }
+                    });
+              } else {
+                Log.d(TAG, "File is already present");
+                thumbanilPDF.generateImageFromPdf(Uri.fromFile(file));
+              }
             }
           }
+          storageAdapter.notifyDataSetChanged();
         }
-      }
 
-      @Override
-      public void onCancelled(DatabaseError databaseError) {
-        Log.e(TAG, databaseError.getMessage());
-      }
-    });
-    return view;
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+          Log.e(TAG, databaseError.getMessage());
+        }
+      });
+      return null;
+    }
   }
 
 }
