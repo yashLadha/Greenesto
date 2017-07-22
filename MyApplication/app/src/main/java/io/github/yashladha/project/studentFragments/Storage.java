@@ -16,17 +16,19 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
+import java.util.HashSet;
 
 import io.github.yashladha.project.Adapter.StorageAdapter;
 import io.github.yashladha.project.R;
@@ -44,6 +46,7 @@ public class Storage extends Fragment {
   private static final DatabaseReference DATABASE = FirebaseDatabase.getInstance().getReference()
       .child(CUR_USER.getUid()).child("Storage");
   private FloatingActionButton uploadBtn;
+  private HashSet<Uri> fileSet;
   private static final int PDF_FIND = 1;
 
   public Storage() {
@@ -84,6 +87,7 @@ public class Storage extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_storage, container, false);
+    fileSet = new HashSet<>();
     storageList = (RecyclerView) view.findViewById(R.id.rv_storage_list);
     RecyclerView.LayoutManager lm = new GridLayoutManager(getContext(), 3);
     storageList.setLayoutManager(lm);
@@ -95,6 +99,23 @@ public class Storage extends Fragment {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("application/pdf");
         startActivityForResult(intent, PDF_FIND);
+      }
+    });
+
+    DATABASE.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        for (DataSnapshot data : dataSnapshot.getChildren()) {
+          if (!fileSet.contains(Uri.parse((String) data.getValue()))) {
+            Log.d(TAG, String.valueOf(Uri.parse((String) data.getValue())));
+            fileSet.add(Uri.parse((String) data.getValue()));
+          }
+        }
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+        Log.e(TAG, databaseError.getMessage());
       }
     });
     return view;
