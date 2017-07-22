@@ -2,16 +2,17 @@ package io.github.yashladha.project.studentFragments;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,7 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -44,6 +44,8 @@ public class ChatUI extends AppCompatActivity {
   private EditText messageBox;
   private RecyclerView messageList;
   private FloatingActionButton sendButton;
+  private ImageView voiceCall;
+  private ImageView videoCall;
 
   private User tempChatUser;
   private HashSet<String> messages;
@@ -61,6 +63,8 @@ public class ChatUI extends AppCompatActivity {
     inflateChat inflatter = new inflateChat();
     inflatter.execute(DATABASE);
 
+    getSupportActionBar().setTitle("Chat");
+
     messages = new HashSet<>();
     messageCnt = new ArrayList<>();
     messageBox = (EditText) findViewById(R.id.et_message_input);
@@ -70,6 +74,25 @@ public class ChatUI extends AppCompatActivity {
     messageList.setLayoutManager(lm);
     chatAdapter = new ChatAdapter(messageCnt, UID);
     messageList.setAdapter(chatAdapter);
+
+    voiceCall = (ImageView) findViewById(R.id.iv_voice_call);
+    videoCall = (ImageView) findViewById(R.id.iv_video_call);
+
+    voiceCall.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Log.d(TAG, "Voice Call initiated");
+        Toast.makeText(getApplicationContext(), "Voice Call", Toast.LENGTH_SHORT).show();
+      }
+    });
+
+    videoCall.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Log.d(TAG, "Video Call initiated");
+        Toast.makeText(getApplicationContext(), "Video Call", Toast.LENGTH_SHORT).show();
+      }
+    });
 
     sendButton.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -84,6 +107,38 @@ public class ChatUI extends AppCompatActivity {
       }
     });
 
+  }
+
+  private void circularRevelVoice(View view) {
+  }
+
+  private void listenChats() {
+    DatabaseReference listen = DATABASE.getReference()
+        .child(tempChatUser.getUid())
+        .child("Messages");
+    listen.addValueEventListener(
+        new ValueEventListener() {
+          @Override
+          public void onDataChange(DataSnapshot dataSnapshot) {
+            for (DataSnapshot item : dataSnapshot.getChildren()) {
+              String key = item.getKey();
+              if (messages.contains(key)) {
+                Log.d(TAG, "Message already inflated");
+              } else {
+                messages.add(key);
+                ChatMessage tempMessage = item.getValue(ChatMessage.class);
+                messageCnt.add(tempMessage);
+                chatAdapter.notifyDataSetChanged();
+              }
+            }
+          }
+
+          @Override
+          public void onCancelled(DatabaseError databaseError) {
+            Log.e(TAG, databaseError.getMessage());
+          }
+        }
+    );
   }
 
   private void sendMessage(String id_, ChatMessage message) {
@@ -148,6 +203,11 @@ public class ChatUI extends AppCompatActivity {
           }
       );
       return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+      listenChats();
     }
   }
 

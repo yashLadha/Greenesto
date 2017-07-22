@@ -2,6 +2,8 @@ package io.github.yashladha.project.studentFragments.util;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
@@ -9,10 +11,18 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 
+import java.util.ArrayList;
+
+import io.github.yashladha.project.Adapter.CustomAdapter;
+import io.github.yashladha.project.Models.Quiz;
 import io.github.yashladha.project.R;
 
 public class utilPlayLecture extends YouTubeBaseActivity
-    implements YouTubePlayer.OnInitializedListener{
+    implements YouTubePlayer.OnInitializedListener {
+
+  private static int NUM_PAGES = 3;
+  private ViewPager mPager;
+  private PagerAdapter pagerAdapter;
 
   private String TAG = getClass().getSimpleName();
   private String VideoID;
@@ -28,6 +38,35 @@ public class utilPlayLecture extends YouTubeBaseActivity
     Intent intent = getIntent();
     Bundle bundle = intent.getBundleExtra("Video Details");
     VideoID = bundle.getString("Video ID");
+
+    ArrayList<Quiz> questions = new ArrayList<>();
+    questions.add(new Quiz("Which one of the following does not involve coagulation? ",
+        new String[]{
+            "Peptization",
+            "Formation of delta regions",
+            "Treatment of drinking water by potash alum",
+            "Clotting of blood by the use of ferric chloride"
+        }));
+
+    questions.add(new Quiz("Rate of physical adsorption increase with? ",
+        new String[]{
+            "increase in temperature",
+            "decrease in pressure",
+            "decrease in temperature",
+            "decrease in surface area"
+        }));
+
+    questions.add(new Quiz("The colour of sky is due to? ",
+        new String[]{
+            "absorption of light by atmospheric gases",
+            "wavelength of scattered light",
+            "transmission of light",
+            "All of these"
+        }));
+
+    mPager = (ViewPager) findViewById(R.id.slide_quiz);
+    pagerAdapter = new CustomAdapter(getApplicationContext(), questions);
+    mPager.setAdapter(pagerAdapter);
 
     ytView = (YouTubePlayerView) findViewById(R.id.youtube_play_view);
     ytView.initialize(getString(R.string.youtube_api_key), this);

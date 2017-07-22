@@ -33,7 +33,6 @@ public class SettingsStudent extends Fragment {
   private Button updateProfile;
 
   public SettingsStudent() {
-    // Required empty public constructor
   }
 
 

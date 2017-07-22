@@ -40,7 +40,7 @@ public class Lecture extends Fragment
       public void onClick(View v) {
         Intent intent = new Intent(getContext(), utilPlayLecture.class);
         Bundle bundle = new Bundle();
-        bundle.putString("Video ID", "fhWaJi1Hsfo");
+        bundle.putString("Video ID", "kCiHeSyTF3Y");
         intent.putExtra("Video Details", bundle);
         startActivity(intent);
       }
@@ -53,7 +53,7 @@ public class Lecture extends Fragment
                                       YouTubeThumbnailLoader youTubeThumbnailLoader) {
     ytThumbnailLoader = youTubeThumbnailLoader;
     youTubeThumbnailLoader.setOnThumbnailLoadedListener(new ThumbnailLoader());
-    ytThumbnailLoader.setVideo("fhWaJi1Hsfo");
+    ytThumbnailLoader.setVideo("kCiHeSyTF3Y");
   }
 
   @Override

@@ -7,6 +7,19 @@
 	<string name="open_drawer">Open Drawer</string>
 	<string name="close_drawer">Close Drawer</string>
 
+	<string-array name="genre">
+		<item>CS</item>
+		<item>Humanity</item>
+		<item>Physics</item>
+		<item>Chemistry</item>
+	</string-array>
+
+	<string-array name="level">
+		<item>Beginner</item>
+		<item>Intermediate</item>
+		<item>Advanced</item>
+	</string-array>
+
 	<string-array name="student">
 		<item>Home</item>
 		<item>Course</item>
