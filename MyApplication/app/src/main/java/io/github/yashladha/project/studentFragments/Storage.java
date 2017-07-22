@@ -27,11 +27,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
+import java.io.File;
 import java.util.HashSet;
 
 import io.github.yashladha.project.Adapter.StorageAdapter;
 import io.github.yashladha.project.R;
+import io.github.yashladha.project.studentFragments.util.ThumbanilPDF;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -47,6 +51,7 @@ public class Storage extends Fragment {
       .child(CUR_USER.getUid()).child("Storage");
   private FloatingActionButton uploadBtn;
   private HashSet<Uri> fileSet;
+  private ThumbanilPDF thumbanilPDF;
   private static final int PDF_FIND = 1;
 
   public Storage() {
@@ -92,6 +97,7 @@ public class Storage extends Fragment {
     RecyclerView.LayoutManager lm = new GridLayoutManager(getContext(), 3);
     storageList.setLayoutManager(lm);
     uploadBtn = (FloatingActionButton) view.findViewById(R.id.fab_storage_upload);
+    thumbanilPDF = new ThumbanilPDF(getContext());
 
     uploadBtn.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -109,6 +115,20 @@ public class Storage extends Fragment {
           if (!fileSet.contains(Uri.parse((String) data.getValue()))) {
             Log.d(TAG, String.valueOf(Uri.parse((String) data.getValue())));
             fileSet.add(Uri.parse((String) data.getValue()));
+            File file = new File("/sdcard/" + data.getKey() + ".pdf");
+            if (!file.exists()) {
+              Ion.with(getContext())
+                  .load((String) data.getValue())
+                  .write(new File("/sdcard/"+data.getKey()+".pdf"))
+                  .setCallback(new FutureCallback<File>() {
+                    @Override
+                    public void onCompleted(Exception e, File result) {
+                      Log.d(TAG, "File download successful " + result.getName());
+                    }
+                  });
+            } else {
+              Log.d(TAG, "File is already present");
+            }
           }
         }
       }
