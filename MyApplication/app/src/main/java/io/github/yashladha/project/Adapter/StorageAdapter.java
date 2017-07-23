@@ -39,7 +39,8 @@ public class StorageAdapter extends RecyclerView.Adapter<StorageAdapter.ViewHold
     StorageFiles temp = files.get(position);
     File fileName = new File(Uri.parse(temp.getFileUri()).getPath());
     holder.textView.setText(fileName.getName());
-    holder.imageView.setImageURI(Uri.parse(temp.getThumbnailUri()));
+    Ion.with(holder.imageView)
+        .load(temp.getThumbnailUri());
   }
 
   @Override

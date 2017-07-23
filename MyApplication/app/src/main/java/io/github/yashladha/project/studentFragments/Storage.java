@@ -47,11 +47,13 @@ public class Storage extends Fragment {
   private String TAG = getClass().getSimpleName();
   private RecyclerView storageList;
   private StorageAdapter storageAdapter;
+
   private static final FirebaseUser CUR_USER = FirebaseAuth.getInstance().getCurrentUser();
   private static final StorageReference STORAGE = FirebaseStorage.getInstance().getReference()
       .child(CUR_USER.getUid());
   private static final DatabaseReference DATABASE = FirebaseDatabase.getInstance().getReference()
       .child(CUR_USER.getUid()).child("Storage");
+
   private FloatingActionButton uploadBtn;
   private HashSet<Uri> fileSet;
   private ArrayList<StorageFiles> filesAdap;
@@ -70,12 +72,13 @@ public class Storage extends Fragment {
         StorageReference fileLoc = STORAGE.child(uri.getLastPathSegment());
         UploadTask uploadTask = fileLoc.putFile(uri);
 
+        final DatabaseReference uploadRef = DATABASE.push();
         uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
           @Override
           public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
             if (task.isSuccessful()) {
               Log.d(TAG, "Task is successful");
-              DATABASE.push().setValue(task.getResult().getDownloadUrl().toString())
+              uploadRef.child("fileUri").setValue(task.getResult().getDownloadUrl().toString())
                   .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -83,6 +86,30 @@ public class Storage extends Fragment {
                         Toast.makeText(getContext(), "Uploaded successfully", Toast.LENGTH_SHORT)
                             .show();
                       }
+                    }
+                  });
+            }
+          }
+        });
+        thumbanilPDF.generateImageFromPdf(uri);
+        File tempFile = new File(uri.getPath());
+        Uri imageFile = Uri.fromFile(new File("/sdcard/"
+            + tempFile.getName().replace(".pdf", "")
+            + ".png"));
+        fileLoc = STORAGE.child(imageFile.getLastPathSegment());
+        uploadTask = fileLoc.putFile(imageFile);
+
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+          @Override
+          public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+            if (task.isSuccessful()) {
+              uploadRef.child("thumbnailUri").setValue(task.getResult().getDownloadUrl().toString())
+                  .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                      if (task.isSuccessful())
+                        Toast.makeText(getContext(), "Image created successfully",
+                            Toast.LENGTH_SHORT).show();
                     }
                   });
             }
@@ -102,7 +129,7 @@ public class Storage extends Fragment {
     RecyclerView.LayoutManager lm = new GridLayoutManager(getContext(), 3);
     storageList.setLayoutManager(lm);
     uploadBtn = (FloatingActionButton) view.findViewById(R.id.fab_storage_upload);
-    thumbanilPDF = new ThumbanilPDF(getContext(), filesAdap);
+    thumbanilPDF = new ThumbanilPDF(getContext());
     storageAdapter = new StorageAdapter(filesAdap, getContext());
     storageList.setAdapter(storageAdapter);
 
@@ -129,26 +156,8 @@ public class Storage extends Fragment {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
           for (DataSnapshot data : dataSnapshot.getChildren()) {
-            if (!fileSet.contains(Uri.parse((String) data.getValue()))) {
-              Log.d(TAG, String.valueOf(Uri.parse((String) data.getValue())));
-              fileSet.add(Uri.parse((String) data.getValue()));
-              File file = new File("/sdcard/" + data.getKey() + ".pdf");
-              if (!file.exists()) {
-                Ion.with(getContext())
-                    .load((String) data.getValue())
-                    .write(new File("/sdcard/"+data.getKey()+".pdf"))
-                    .setCallback(new FutureCallback<File>() {
-                      @Override
-                      public void onCompleted(Exception e, File result) {
-                        Log.d(TAG, "File download successful " + result.getName());
-                        thumbanilPDF.generateImageFromPdf(Uri.fromFile(result));
-                      }
-                    });
-              } else {
-                Log.d(TAG, "File is already present");
-                thumbanilPDF.generateImageFromPdf(Uri.fromFile(file));
-              }
-            }
+            StorageFiles temp = data.getValue(StorageFiles.class);
+            filesAdap.add(temp);
           }
           storageAdapter.notifyDataSetChanged();
         }

@@ -9,6 +9,9 @@ public class StorageFiles {
     this.thumbnailUri = thumbnailUri;
   }
 
+  public StorageFiles() {
+  }
+
   public String getFileUri() {
     return fileUri;
   }

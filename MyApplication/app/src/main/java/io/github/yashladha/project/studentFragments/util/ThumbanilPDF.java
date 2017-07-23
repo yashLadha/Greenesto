@@ -12,20 +12,15 @@ import com.shockwave.pdfium.PdfiumCore;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-
-import io.github.yashladha.project.Models.StorageFiles;
 
 public class ThumbanilPDF {
 
   private static String TAG = "ThumbanilPDF";
   private static String FOLDER = "/sdcard";
   private final Context context;
-  private ArrayList<StorageFiles> files;
 
-  public ThumbanilPDF(Context context, ArrayList<StorageFiles> filesAdap) {
+  public ThumbanilPDF(Context context) {
     this.context = context;
-    this.files = filesAdap;
   }
 
   public void generateImageFromPdf(Uri pdfUri) {
@@ -37,7 +32,6 @@ public class ThumbanilPDF {
     File imgFile = new File(file, tempFile.getName().replace(".pdf","") +".png");
     if (imgFile.exists()) {
       Log.d(TAG, "Thumbnail already created");
-      files.add(new StorageFiles(pdfUri.toString(), Uri.fromFile(imgFile).toString()));
       return;
     }
 
@@ -65,7 +59,6 @@ public class ThumbanilPDF {
       File imgFile = new File(file, tempFile.getName().replace(".pdf","") +".png");
       out = new FileOutputStream(imgFile);
       bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-      files.add(new StorageFiles(pdfUri.toString(), Uri.fromFile(imgFile).toString()));
     } catch (Exception e) {
       Log.e(TAG, e.getMessage());
     } finally {
