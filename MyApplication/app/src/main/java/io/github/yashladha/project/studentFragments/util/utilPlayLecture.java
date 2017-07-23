@@ -2,6 +2,7 @@ package io.github.yashladha.project.studentFragments.util;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -12,6 +13,8 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.github.yashladha.project.Adapter.CustomAdapter;
 import io.github.yashladha.project.Models.Quiz;
@@ -21,6 +24,7 @@ public class utilPlayLecture extends YouTubeBaseActivity
     implements YouTubePlayer.OnInitializedListener {
 
   private static int NUM_PAGES = 3;
+  private int curPage = 0;
   private ViewPager mPager;
   private PagerAdapter pagerAdapter;
 
@@ -70,6 +74,18 @@ public class utilPlayLecture extends YouTubeBaseActivity
 
     ytView = (YouTubePlayerView) findViewById(R.id.youtube_play_view);
     ytView.initialize(getString(R.string.youtube_api_key), this);
+
+    final Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        if (curPage == NUM_PAGES)
+          curPage = 0;
+        mPager.setCurrentItem(curPage++, true);
+        handler.postDelayed(this, 15000);
+      }
+    };
+    handler.postDelayed(runnable, 15000);
 
   }
 
