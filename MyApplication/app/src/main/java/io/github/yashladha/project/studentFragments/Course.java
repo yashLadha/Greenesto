@@ -1,12 +1,12 @@
 package io.github.yashladha.project.studentFragments;
 
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -16,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,9 +42,8 @@ public class Course extends Fragment {
 
   private GridView courseGrid;
   private StudentCourseAdapter courseAdapter;
+  private boolean isTouched = false;
   private Spinner courseOptionSpinner;
-  private static final int STAGES = 2;
-  private int choicesClicked = 0;
 
   public Course() {
   }
@@ -67,126 +65,106 @@ public class Course extends Fragment {
     courseGrid.setLayoutAnimation(controller);
     courseGrid.setAdapter(courseAdapter);
 
-    courseAsyncInflater logic = new courseAsyncInflater();
+    courseOptionSpinner.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        isTouched = true;
+        return false;
+      }
+    });
+
+    final List<String> genre = Arrays.asList(getResources()
+        .getStringArray(R.array.genre));
+    ArrayAdapter<String> genreAdapter = getStringArrayAdapter(genre);
     try {
-      logic.execute(courseAdapter);
-    } catch (NullPointerException e) {
-      Log.e(TAG, "courseAdapter is null");
+      courseOptionSpinner.setAdapter(genreAdapter);
+      courseOptionSpinner.setSelection(0, false);
+      courseOptionSpinner.setOnItemSelectedListener(
+          new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent,
+                                       View view, int position, long id) {
+              if (isTouched) {
+                isTouched = false;
+                Log.d("Genre selected: ", genre.get(position));
+                courseOptionSpinner.setClickable(false);
+                inflateDatabase(position, genre, "genre");
+              }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+              Log.d(TAG, "No Item is selected");
+            }
+          }
+      );
+    } catch (Exception e) {
+      Log.e(TAG, "Error Occured in Thread");
     }
 
     return view;
   }
 
-  private class courseAsyncInflater extends AsyncTask<StudentCourseAdapter, Void, Void> {
+  @NonNull
+  private ArrayAdapter<String> getStringArrayAdapter(List<String> genre) {
+    ArrayAdapter<String> genreAdapter = new ArrayAdapter<String>(
+        getContext(),
+        android.R.layout.simple_spinner_item,
+        genre
+    );
+    genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    return genreAdapter;
+  }
 
-    @Override
-    protected Void doInBackground(StudentCourseAdapter... params) {
-      StudentCourseAdapter adapter = params[0];
-      if (adapter != null) {
-        Log.d(TAG, "Logic for course initiated");
-        logicCourse(choicesClicked);
-      }
-      return null;
-    }
+  private void inflateDatabase(int position, List<String> genre, String s) {
+    DatabaseReference setGenre = DATABASE_REFERENCE
+        .child(CURRENT_USER.getUid())
+        .child(s);
+    setGenre.setValue(genre.get(position)).addOnCompleteListener(
+        new OnCompleteListener<Void>() {
+          @Override
+          public void onComplete(@NonNull Task<Void> task) {
+            if (task.isSuccessful()) {
+              courseOptionSpinner.setClickable(true);
+              final List<String> level = Arrays.asList(getResources().getStringArray(R.array.level));
+              ArrayAdapter<String> levelAdapter = getStringArrayAdapter(level);
+              courseOptionSpinner.setAdapter(levelAdapter);
+              courseOptionSpinner.setSelection(0, false);
+              courseOptionSpinner.setOnItemSelectedListener(
 
-    protected void inflateGrid() {
-      Log.d(TAG, "Inflate the grid view");
-      ArrayList<CourseModel> courses = new ArrayList<>();
-      courses.add(new CourseModel("C++", "CS"));
-      courses.add(new CourseModel("Calculus", "Mathematics"));
-      courseAdapter = new StudentCourseAdapter(getContext(), courses);
-      courseGrid.setAdapter(courseAdapter);
-      courseAdapter.notifyDataSetChanged();
-    }
+                  new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int position, long id) {
+                      if (isTouched) {
+                        Log.d("Level selected: ", level.get(position));
+                        courseOptionSpinner.setClickable(false);
+                        inflateGrid();
+                      }
+                    }
 
-    private void logicCourse(int i) {
-      switch (i) {
-        case 0:
-          final List<String> genre = Arrays.asList(getResources()
-              .getStringArray(R.array.genre));
-          ArrayAdapter<String> genreAdapter = getStringArrayAdapter(genre);
-          try {
-            courseOptionSpinner.setAdapter(genreAdapter);
-            courseOptionSpinner.setSelection(0, false);
-            courseOptionSpinner.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
-                  @Override
-                  public void onItemSelected(AdapterView<?> parent,
-                                             View view, int position, long id) {
-                    choicesClicked++;
-                    Log.d("Genre selected: ", genre.get(position));
-                    courseOptionSpinner.setClickable(false);
-                    inflateDatabase(position, genre, "genre");
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                      Log.e(TAG, "No Item is selected");
+                    }
                   }
-
-                  @Override
-                  public void onNothingSelected(AdapterView<?> parent) {
-                    Log.d(TAG, "No Item is selected");
-                  }
-                }
-            );
-          } catch (Exception e) {
-            Log.e(TAG, "Error Occured in Thread");
-          }
-          break;
-        case 1:
-          final List<String> level = Arrays.asList(getResources().getStringArray(R.array.level));
-          ArrayAdapter<String> levelAdapter = getStringArrayAdapter(level);
-          courseOptionSpinner.setAdapter(levelAdapter);
-          courseOptionSpinner.setSelection(0, false);
-          courseOptionSpinner.setOnItemSelectedListener(
-
-              new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                  choicesClicked++;
-                  Log.d("Level selected: ", level.get(position));
-                  courseOptionSpinner.setClickable(false);
-                  inflateDatabase(position, level, "level");
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                  Log.e(TAG, "No Item is selected");
-                }
-              }
-          );
-          break;
-        case 2:
-          inflateGrid();
-          break;
-      }
-    }
-
-    @NonNull
-    private ArrayAdapter<String> getStringArrayAdapter(List<String> genre) {
-      ArrayAdapter<String> genreAdapter = new ArrayAdapter<String>(
-          getContext(),
-          android.R.layout.simple_spinner_item,
-          genre
-      );
-      genreAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-      return genreAdapter;
-    }
-
-    private void inflateDatabase(int position, List<String> genre, String s) {
-      DatabaseReference setGenre = DATABASE_REFERENCE
-          .child(CURRENT_USER.getUid())
-          .child(s);
-      setGenre.setValue(genre.get(position)).addOnCompleteListener(
-          new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-              if (task.isSuccessful()) {
-                courseOptionSpinner.setClickable(true);
-                logicCourse(choicesClicked);
-              } else {
-                Log.d(TAG, "Error occured in task");
-              }
+              );
+            } else {
+              Log.d(TAG, "Error occured in task");
             }
           }
-      );
-    }
+        }
+    );
+  }
+
+  protected void inflateGrid() {
+    Log.d(TAG, "Inflate the grid view");
+    ArrayList<CourseModel> courses = new ArrayList<>();
+    courses.add(new CourseModel("C++", "CS"));
+    courses.add(new CourseModel("Calculus", "Mathematics"));
+    courseAdapter = new StudentCourseAdapter(getContext(), courses);
+    courseGrid.setAdapter(courseAdapter);
+    courseAdapter.notifyDataSetChanged();
   }
 
 }
