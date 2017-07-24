@@ -1,4 +1,4 @@
-package io.github.yashladha.project.studentFragments;
+package io.github.yashladha.project.Fragments;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;

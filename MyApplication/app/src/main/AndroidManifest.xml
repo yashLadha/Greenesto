@@ -31,14 +31,14 @@
 			android:label="Sign Up"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".StudentPortal"
+			android:name=".Portal"
 			android:label="Student Portal"/>
-		<activity android:name=".studentFragments.util.utilPlayLecture">
+		<activity android:name=".Fragments.util.utilPlayLecture">
 		</activity>
-		<activity android:name=".studentFragments.ChatUI">
+		<activity android:name=".Fragments.ChatUI">
 		</activity>
 		<activity
-			android:name=".studentFragments.VoiceCall_"
+			android:name=".Fragments.VoiceCall_"
 			android:theme="@style/AppTheme.Transparent"/>
 	</application>
 

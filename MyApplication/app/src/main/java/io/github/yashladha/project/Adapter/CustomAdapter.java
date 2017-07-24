@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 import io.github.yashladha.project.Models.Quiz;
 import io.github.yashladha.project.R;
-import io.github.yashladha.project.studentFragments.util.utilPlayLecture;
 
 public class CustomAdapter extends PagerAdapter {
 

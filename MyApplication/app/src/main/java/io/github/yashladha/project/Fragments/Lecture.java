@@ -1,4 +1,4 @@
-package io.github.yashladha.project.studentFragments;
+package io.github.yashladha.project.Fragments;
 
 
 import android.content.Intent;
@@ -14,7 +14,7 @@ import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
 
 import io.github.yashladha.project.R;
-import io.github.yashladha.project.studentFragments.util.utilPlayLecture;
+import io.github.yashladha.project.Fragments.util.utilPlayLecture;
 
 public class Lecture extends Fragment
     implements YouTubeThumbnailView.OnInitializedListener {

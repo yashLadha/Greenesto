@@ -1,4 +1,4 @@
-package io.github.yashladha.project.studentFragments.util;
+package io.github.yashladha.project.Fragments.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;

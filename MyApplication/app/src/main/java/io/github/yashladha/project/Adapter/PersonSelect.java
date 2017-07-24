@@ -14,7 +14,7 @@ import java.util.List;
 
 import io.github.yashladha.project.R;
 import io.github.yashladha.project.User;
-import io.github.yashladha.project.studentFragments.ChatUI;
+import io.github.yashladha.project.Fragments.ChatUI;
 
 public class PersonSelect extends RecyclerView.Adapter<PersonSelect.ViewHolder> {
 

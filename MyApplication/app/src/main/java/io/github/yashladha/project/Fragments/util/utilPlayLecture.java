@@ -1,4 +1,4 @@
-package io.github.yashladha.project.studentFragments.util;
+package io.github.yashladha.project.Fragments.util;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +13,6 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import io.github.yashladha.project.Adapter.CustomAdapter;
 import io.github.yashladha.project.Models.Quiz;

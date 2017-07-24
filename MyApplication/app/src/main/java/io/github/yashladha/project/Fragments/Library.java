@@ -1,4 +1,4 @@
-package io.github.yashladha.project.studentFragments;
+package io.github.yashladha.project.Fragments;
 
 
 import android.content.Intent;
@@ -22,7 +22,6 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
-import java.io.IOException;
 
 import io.github.yashladha.project.R;
 

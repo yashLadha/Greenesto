@@ -4,7 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context="io.github.yashladha.project.studentFragments.Home">
+	tools:context="io.github.yashladha.project.Fragments.Home">
 
 	<TextView
 		android:id="@+id/tvStudentEmail"

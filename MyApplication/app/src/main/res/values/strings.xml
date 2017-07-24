@@ -20,6 +20,36 @@
 		<item>Advanced</item>
 	</string-array>
 
+	<string-array name="teacher">
+		<item>Home</item>
+		<item>Go Live</item>
+		<item>Chat</item>
+		<item>Library</item>
+		<item>Uploaded Assignment</item>
+		<item>Tools</item>
+		<item>Setting</item>
+		<item>Student Report</item>
+	</string-array>
+
+	<string-array name="parent">
+		<item>Home</item>
+		<item>Tools</item>
+		<item>Settings</item>
+		<item>Finance</item>
+		<item>Payment</item>
+	</string-array>
+
+	<string-array name="admin">
+		<item>Home</item>
+		<item>Course</item>
+		<item>Chat</item>
+		<item>Library</item>
+		<item>Storage</item>
+		<item>Tools</item>
+		<item>Settings</item>
+		<item>Finance</item>
+	</string-array>
+
 	<string-array name="student">
 		<item>Home</item>
 		<item>Course</item>

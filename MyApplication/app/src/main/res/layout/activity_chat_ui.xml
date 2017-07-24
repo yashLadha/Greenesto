@@ -15,7 +15,7 @@
 		xmlns:tools="http://schemas.android.com/tools"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		tools:context="io.github.yashladha.project.studentFragments.ChatUI">
+		tools:context="io.github.yashladha.project.Fragments.ChatUI">
 
 		<AutoCompleteTextView
 			android:id="@+id/et_message_input"

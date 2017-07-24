@@ -1,4 +1,4 @@
-package io.github.yashladha.project.studentFragments;
+package io.github.yashladha.project.Fragments;
 
 
 import android.content.Intent;
@@ -28,8 +28,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ import java.util.HashSet;
 import io.github.yashladha.project.Adapter.StorageAdapter;
 import io.github.yashladha.project.Models.StorageFiles;
 import io.github.yashladha.project.R;
-import io.github.yashladha.project.studentFragments.util.ThumbanilPDF;
+import io.github.yashladha.project.Fragments.util.ThumbanilPDF;
 
 import static android.app.Activity.RESULT_OK;
 

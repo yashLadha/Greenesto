@@ -92,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
 						public void onSuccess(AuthResult authResult) {
 							Log.d(TAG, "User is signed in " + authResult.getUser().getEmail());
 							//TODO: Needs to be done based on the type of login
-							Intent intent = new Intent(getApplicationContext(), StudentPortal.class);
+							Intent intent = new Intent(getApplicationContext(), Portal.class);
 							startActivity(intent);
 							finish();
 						}

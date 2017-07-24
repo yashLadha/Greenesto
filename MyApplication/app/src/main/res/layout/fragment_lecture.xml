@@ -4,7 +4,7 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context="io.github.yashladha.project.studentFragments.Lecture">
+	tools:context="io.github.yashladha.project.Fragments.Lecture">
 
 	<com.google.android.youtube.player.YouTubeThumbnailView
 		android:id="@+id/youtube_thumbnail_view"
