@@ -2,8 +2,11 @@ package io.github.yashladha.project.studentFragments;
 
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 import io.github.yashladha.project.R;
 import io.github.yashladha.project.User;
@@ -36,6 +41,12 @@ public class Home extends Fragment {
 	private String TAG = getClass().getSimpleName();
 	private TextView display;
 	private CalendarView mCalendar;
+
+  private ViewPager mPager;
+  private PagerAdapter newsAdapter;
+
+  private ArrayList<String> news;
+  private int cur_news = 0;
 
 	public Home() {
 		// Required empty public constructor
@@ -65,7 +76,16 @@ public class Home extends Fragment {
 		display = (TextView) view.findViewById(R.id.tvStudentEmail);
 		mCalendar = (CalendarView) view.findViewById(R.id.cv_home_calendar);
 
-		mAuthListener = new FirebaseAuth.AuthStateListener() {
+    news = new ArrayList<>();
+    news.add("News: 1");
+    news.add("News: 2");
+    news.add("News: 3");
+
+    mPager = (ViewPager) view.findViewById(R.id.pager_news_strip);
+    newsAdapter = new NewsStripAdapter(getContext(), news);
+    mPager.setAdapter(newsAdapter);
+
+    mAuthListener = new FirebaseAuth.AuthStateListener() {
 			@Override
 			public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 				FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -87,6 +107,18 @@ public class Home extends Fragment {
 				});
 			}
 		};
+
+    final Handler handler = new Handler();
+    Runnable run = new Runnable() {
+      @Override
+      public void run() {
+        if (cur_news == news.size())
+          cur_news = 0;
+        mPager.setCurrentItem(cur_news++, true);
+        handler.postDelayed(this, 3000);
+      }
+    };
+    handler.postDelayed(run, 3000);
 
 		return view;
 	}

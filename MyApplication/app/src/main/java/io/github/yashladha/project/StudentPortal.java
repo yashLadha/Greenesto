@@ -22,6 +22,7 @@ import io.github.yashladha.project.studentFragments.Lecture;
 import io.github.yashladha.project.studentFragments.Library;
 import io.github.yashladha.project.studentFragments.SettingsStudent;
 import io.github.yashladha.project.studentFragments.Storage;
+import io.github.yashladha.project.studentFragments.Tools;
 
 public class StudentPortal extends AppCompatActivity {
 
@@ -127,6 +128,9 @@ public class StudentPortal extends AppCompatActivity {
         break;
       case 5:
         fragment = new Storage();
+        break;
+      case 6:
+        fragment = new Tools();
         break;
       case 7:
         fragment = new SettingsStudent();
